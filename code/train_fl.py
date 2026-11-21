@@ -41,7 +41,8 @@ DEVICE = os.environ.get("TABFL_DEVICE", "cpu")   # "mps" runs local training on 
 
 DEFAULTS = dict(dataset="ciciot2023", method="TAB-FL", attack="none", rho=0.0, beta=0.3,
                 seed=0, rounds=50, K=20, local_steps=10, batch=32, lr=0.005, momentum=0.9,
-                mu=0.01, opt="adam", onset=0, root_per_class=30, eval_subset=8000, log_trust=False)
+                mu=0.01, opt="adam", onset=0, root_per_class=30, eval_subset=8000, log_trust=False,
+                f_assumed=0)   # f_assumed > 0: attacker count given to Krum-type rules (0 = true count)
 
 METHODS = ["FedAvg", "FedProx", "Krum", "Multi-Krum", "Median", "Trimmed Mean", "TAB-FL"]
 ABLATIONS = ["TAB-FL", "TAB-FL w/o EMA", "TAB-FL w/o clipping", "TAB-FL w/o validation",
@@ -52,7 +53,8 @@ ATTACKS = ["label_flip", "sign_flip", "gaussian", "backdoor"]
 def run_id(cfg: dict) -> str:
     m = cfg["method"].replace(" ", "_").replace("/", "")
     return (f"{cfg['dataset']}_{m}_{cfg['attack']}_r{int(round(cfg['rho'] * 100))}"
-            f"_b{cfg['beta']}_on{cfg['onset']}_s{cfg['seed']}")
+            f"_b{cfg['beta']}_on{cfg['onset']}_s{cfg['seed']}"
+            + (f"_f{cfg['f_assumed']}" if cfg.get("f_assumed", 0) else ""))
 
 
 def _metrics(y_true, y_pred, benign=0):
@@ -230,7 +232,8 @@ def run_experiment(cfg: dict) -> dict:
     agg = None if method == "Centralized" else A.build(method)
     if agg is not None:
         agg.reset(K)
-    f_assumed = max(2, int(round(cfg["rho"] * K)))
+    f_assumed = (cfg["f_assumed"] if cfg.get("f_assumed", 0)
+                 else max(2, int(round(cfg["rho"] * K))))   # oracle: the true attacker count
     rl = make_root_losses(probe, Xroot, yroot, C)
     rrl = make_root_record_losses(probe, Xroot, yroot)
     ctx = {"f": f_assumed, "slices": slices,
@@ -374,6 +377,18 @@ def grid(name: str) -> list[dict]:
             for a in ATTACKS:
                 G.append(dict(method=m, attack=a, rho=0.3, seed=s))
                 G.append(dict(method=m, attack=a, rho=0.3, onset=25, seed=s))
+    if name in ("misf", "all"):
+        # misspecified attacker count for the rules that need it: the operator assumes
+        # f = 2 (underestimate) or f = 8 (overestimate) whatever the true fraction
+        for s, ds in itertools.product(seeds, ["ciciot2023", "toniot"]):
+            ms = ["Multi-Krum", "Trimmed Mean"] if ds == "ciciot2023" else ["Multi-Krum"]
+            for m, fa in itertools.product(ms, [2, 8]):
+                if fa == 8:
+                    G.append(dict(dataset=ds, method=m, seed=s, f_assumed=fa))
+                for a, rho in itertools.product(ATTACKS, [0.2, 0.4]):
+                    if fa == 8 and rho == 0.4:
+                        continue          # f = 8 is the true count at 40 %
+                    G.append(dict(dataset=ds, method=m, attack=a, rho=rho, seed=s, f_assumed=fa))
     if name in ("noniid", "all"):
         for m, b in itertools.product(METHODS, [0.1, 0.5, 1.0]):
             G.append(dict(method=m, beta=b, seed=0))
@@ -398,14 +413,15 @@ def collect() -> None:
         fin = {k: v for k, v in r["final"].items() if k != "per_class_f1"}
         rows.append(dict(run_id=r["run_id"], dataset=c["dataset"], method=c["method"],
                          attack=c["attack"], rho=c["rho"], beta=c["beta"], onset=c["onset"],
-                         seed=c["seed"], **fin,
+                         seed=c["seed"], f_assumed=c.get("f_assumed", 0), **fin,
                          mean_agg_ms=float(np.mean(r["history"]["agg_ms"])),
                          n_params=r["n_params"], wall_s=r.get("wall_s", np.nan),
                          per_class_f1=";".join(map(str, r["final"]["per_class_f1"]))))
         for i, rd in enumerate(r["history"]["round"]):
             curves.append(dict(run_id=r["run_id"], dataset=c["dataset"], method=c["method"],
                                attack=c["attack"], rho=c["rho"], beta=c["beta"], onset=c["onset"],
-                               seed=c["seed"], round=rd, macro_f1=r["history"]["macro_f1"][i],
+                               seed=c["seed"], f_assumed=c.get("f_assumed", 0),
+                               round=rd, macro_f1=r["history"]["macro_f1"][i],
                                accuracy=r["history"]["accuracy"][i]))
     res = os.path.join(HERE, "..", "results")
     pd.DataFrame(rows).to_csv(os.path.join(res, "experiment_metrics.csv"), index=False)
@@ -463,7 +479,7 @@ if __name__ == "__main__":
     ap.add_argument("--one", action="store_true")
     ap.add_argument("--reverse", action="store_true", help="walk the grid from the end")
     for k, v in DEFAULTS.items():
-        if k != "log_trust":
+        if k not in ("log_trust",):
             ap.add_argument(f"--{k}", type=type(v), default=v)
     a = ap.parse_args()
     os.makedirs(RUN_DIR, exist_ok=True)

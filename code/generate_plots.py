@@ -53,10 +53,52 @@ def save(fig, name):
     plt.close(fig)
 
 
-def load():
+def load(include_misf: bool = False):
+    """Load the merged results.  Runs with a misspecified attacker count
+    (f_assumed > 0) are only used by the misf table and are dropped otherwise."""
     M = pd.read_csv(os.path.join(RES, "experiment_metrics.csv"))
     R = pd.read_csv(os.path.join(RES, "round_metrics.csv"))
+    for D in (M, R):
+        if "f_assumed" not in D:
+            D["f_assumed"] = 0
+    if not include_misf:
+        M, R = M[M.f_assumed == 0], R[R.f_assumed == 0]
     return M, R
+
+
+def misf_table() -> None:
+    """Macro-F1 (and backdoor ASR) when Krum-type rules get a wrong attacker count."""
+    M, _ = load(include_misf=True)
+    cols = [(a, r) for a in ["sign_flip", "gaussian", "label_flip", "backdoor"] for r in (0.2, 0.4)]
+
+    def cell(ds, m, fa, a, rho, metric="macro_f1"):
+        # f = 8 is the true count at 40 %, and f = 2 the oracle choice for clean runs
+        true_f = max(2, int(round(rho * 20)))
+        d = sel(M, dataset=ds, method=m, attack=a, rho=rho, beta=0.3, onset=0,
+                f_assumed=0 if fa in (0, true_f) else fa)
+        return d[metric].mean(), len(d)
+
+    rows, blocks = [], [("ciciot2023", [("Multi-Krum", 0), ("Multi-Krum", 2), ("Multi-Krum", 8),
+                                        ("Trimmed Mean", 0), ("Trimmed Mean", 2), ("Trimmed Mean", 8),
+                                        ("TAB-FL", 0)]),
+                        ("toniot", [("Multi-Krum", 0), ("Multi-Krum", 2), ("Multi-Krum", 8), ("TAB-FL", 0)])]
+    for ds, rules in blocks:
+        name = "CICIoT2023" if ds == "ciciot2023" else "TON\\_IoT"
+        rows.append(f"\\multicolumn{{12}}{{l}}{{\\emph{{{name}}}}} \\\\")
+        for m, fa in rules:
+            label = {0: "true $f$" if m != "TAB-FL" else "no $f$", 2: "$f=2$", 8: "$f=8$"}[fa]
+            cl, n0 = cell(ds, m, fa, "none", 0.0)
+            vals = [f"{cl:.3f}"]
+            for a, rho in cols:
+                v, n = cell(ds, m, fa, a, rho)
+                vals.append(f"{v:.3f}" if n else "--")
+            asr, n = cell(ds, m, fa, "backdoor", 0.4, "asr")
+            vals.append(f"{asr:.2f}" if n else "--")
+            rows.append(f"{m} & {label} & " + " & ".join(vals) + " \\\\")
+        rows.append("\\midrule")
+    with open(os.path.join(TAB, "misf.tex"), "w") as fh:
+        fh.write("\n".join(rows[:-1]) + "\n")
+    print("\n".join(rows[:-1]))
 
 
 def sel(df, **kw):
@@ -344,7 +386,8 @@ def tables(M, R):
 
 if __name__ == "__main__":
     M, R = load()
-    for f, args in [(fig2, (R,)), (fig3, (M,)), (fig4, ()), (fig5, (M,)), (tables, (M, R))]:
+    for f, args in [(fig2, (R,)), (fig3, (M,)), (fig4, ()), (fig5, (M,)), (tables, (M, R)),
+                    (misf_table, ())]:
         try:
             f(*args)
             print("ok", f.__name__)

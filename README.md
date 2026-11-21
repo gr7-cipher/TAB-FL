@@ -34,7 +34,7 @@ Every round, for every gateway update:
 
 ## Main results
 
-The study has 820 complete 50-round runs: K = 20 gateways, four attacks, 0-40 % malicious
+The study has 937 complete 50-round runs: K = 20 gateways, four attacks, 0-40 % malicious
 gateways, 3 seeds for every headline setting. Every number below comes from
 `results/experiment_metrics.csv`.
 
@@ -68,6 +68,21 @@ Summary:
   skew (beta = 0.1). On TON_IoT its false-positive rate is higher than Multi-Krum's.
 - **Peer groups.** On TON_IoT, peer groups cut the share of honest gateways wrongly quarantined
   from 18.9 % to 3.4 % and raise Macro-F1 by 0.07-0.11 in every scenario.
+
+**When the attacker count is guessed** (Macro-F1; the operator assumes f = 2 or f = 8 whatever the
+true fraction):
+
+| Rule | CICIoT2023 clean | CICIoT2023 sign flip 40 % | TON_IoT clean | TON_IoT sign flip 40 % | Backdoor ASR, 40 % |
+|---|---|---|---|---|---|
+| Multi-Krum, true f | 0.540 | 0.481 | 0.511 | 0.511 | 0.18 |
+| Multi-Krum, f = 2 | 0.540 | 0.035 | 0.511 | 0.005 | 1.00 |
+| Multi-Krum, f = 8 | 0.502 | 0.481 | 0.455 | 0.511 | 0.18 |
+| TAB-FL (no f) | 0.537 | 0.458 | 0.495 | 0.531 | 0.11-0.18 |
+
+Underestimating f makes Multi-Krum collapse and accept the backdoor in every run. Overestimating it
+costs 4-6 points without any attack. Over all 18 settings, TAB-FL is ahead of Multi-Krum with
+f = 2 in 13 and with f = 8 in 11. It also has the highest worst-case Macro-F1 of all rules that
+are not told f. Multi-Krum that knows the true f still has the best average.
 
 | Convergence (CICIoT2023) | Robustness across attacks |
 |---|---|
@@ -135,17 +150,18 @@ Methods: `FedAvg`, `FedProx`, `Krum`, `Multi-Krum`, `Median`, `Trimmed Mean`, `T
 Attacks: `none`, `label_flip`, `sign_flip`, `gaussian`, `backdoor`. `--onset 25` starts the attack
 at round 25.
 
-The full grid of the paper (820 runs; resumable, one JSON per run in `results/runs/`):
+The full grid of the paper (937 runs; resumable, one JSON per run in `results/runs/`):
 
 ```bash
-python train_fl.py --grid all --workers 4      # or: main, dynamic, toniot, ablation, noniid
+python train_fl.py --grid all --workers 4      # or: main, dynamic, toniot, ablation, noniid, misf
 python train_fl.py --collect                   # writes results/experiment_metrics.csv and round_metrics.csv
 python generate_plots.py                       # Figures 2-5 and results/tables/*.tex
 python shap_analysis.py                        # Figure 6
 python efficiency.py                           # results/efficiency.json
 ```
 
-The grid took about 14 CPU-hours on an Apple M1. `TABFL_DEVICE=mps` runs local training on an
+The grid took about 16 CPU-hours on an Apple M1. `--f_assumed 2` gives Krum-type rules a fixed
+(wrong) attacker count instead of the true one. `TABFL_DEVICE=mps` runs local training on an
 Apple GPU. `TABFL_DATA` and `TABFL_RUNDIR` override the data and output folders.
 
 Because `results/runs/` is included, `--collect`, `generate_plots.py` and the tables can be
