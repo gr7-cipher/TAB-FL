@@ -196,6 +196,11 @@ The paper is under review. Until it is published, please cite this repository:
 }
 ```
 
+## License
+
+The code is released under the [MIT License](LICENSE). The CICIoT2023 and TON_IoT datasets are
+not covered by this license; they remain subject to the terms of their providers.
+
 ## Contact
 
 Ahmad Irjoob (corresponding author), Faculty of Artificial Intelligence, Al-Balqa Applied
