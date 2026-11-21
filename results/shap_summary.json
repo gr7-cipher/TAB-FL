@@ -1,0 +1,340 @@
+[
+ {
+  "dataset": "ciciot2023",
+  "n_explained": 1472,
+  "n_background": 300,
+  "top_features": [
+   [
+    "Number",
+    5.2373
+   ],
+   [
+    "Protocol Type",
+    1.2818
+   ],
+   [
+    "Rate",
+    0.7599
+   ],
+   [
+    "Tot size",
+    0.5933
+   ],
+   [
+    "Header_Length",
+    0.5033
+   ],
+   [
+    "Variance",
+    0.4119
+   ],
+   [
+    "Std",
+    0.299
+   ],
+   [
+    "AVG",
+    0.2932
+   ],
+   [
+    "IAT",
+    0.2484
+   ],
+   [
+    "syn_flag_number",
+    0.1876
+   ],
+   [
+    "Max",
+    0.1524
+   ],
+   [
+    "ack_flag_number",
+    0.1355
+   ]
+  ],
+  "per_class_top3": {
+   "Benign": [
+    [
+     "Number",
+     5.1044
+    ],
+    [
+     "Protocol Type",
+     1.1102
+    ],
+    [
+     "Rate",
+     0.7709
+    ]
+   ],
+   "DDoS": [
+    [
+     "Number",
+     4.8313
+    ],
+    [
+     "Protocol Type",
+     1.095
+    ],
+    [
+     "Rate",
+     0.9151
+    ]
+   ],
+   "DoS": [
+    [
+     "Number",
+     4.9049
+    ],
+    [
+     "Protocol Type",
+     1.2671
+    ],
+    [
+     "Rate",
+     0.7396
+    ]
+   ],
+   "Mirai": [
+    [
+     "Number",
+     6.7479
+    ],
+    [
+     "Protocol Type",
+     2.9467
+    ],
+    [
+     "Tot size",
+     1.9088
+    ]
+   ],
+   "Recon": [
+    [
+     "Number",
+     5.1523
+    ],
+    [
+     "Protocol Type",
+     0.8352
+    ],
+    [
+     "Rate",
+     0.8128
+    ]
+   ],
+   "Spoofing": [
+    [
+     "Number",
+     5.1868
+    ],
+    [
+     "Protocol Type",
+     1.182
+    ],
+    [
+     "Rate",
+     0.6946
+    ]
+   ],
+   "Web": [
+    [
+     "Number",
+     4.925
+    ],
+    [
+     "Rate",
+     0.9624
+    ],
+    [
+     "Protocol Type",
+     0.8408
+    ]
+   ],
+   "BruteForce": [
+    [
+     "Number",
+     5.0179
+    ],
+    [
+     "Protocol Type",
+     0.9321
+    ],
+    [
+     "Rate",
+     0.9125
+    ]
+   ]
+  }
+ },
+ {
+  "dataset": "toniot",
+  "n_explained": 1496,
+  "n_background": 300,
+  "top_features": [
+   [
+    "hour_sin",
+    3.9449
+   ],
+   [
+    "hour_cos",
+    2.5223
+   ],
+   [
+    "dev_Garage_Door",
+    0.5376
+   ],
+   [
+    "dev_Modbus",
+    0.4698
+   ],
+   [
+    "dev_GPS_Tracker",
+    0.4063
+   ],
+   [
+    "temperature",
+    0.3983
+   ],
+   [
+    "temp_condition_high",
+    0.2301
+   ],
+   [
+    "latitude",
+    0.2072
+   ],
+   [
+    "dev_Motion_Light",
+    0.1996
+   ],
+   [
+    "dev_Fridge",
+    0.1851
+   ],
+   [
+    "thermostat_status",
+    0.1663
+   ],
+   [
+    "sphone_signal",
+    0.1625
+   ]
+  ],
+  "per_class_top3": {
+   "normal": [
+    [
+     "hour_sin",
+     5.4444
+    ],
+    [
+     "hour_cos",
+     2.6883
+    ],
+    [
+     "dev_Garage_Door",
+     0.8192
+    ]
+   ],
+   "backdoor": [
+    [
+     "hour_sin",
+     2.745
+    ],
+    [
+     "hour_cos",
+     1.6629
+    ],
+    [
+     "dev_GPS_Tracker",
+     0.6076
+    ]
+   ],
+   "ddos": [
+    [
+     "hour_sin",
+     1.8189
+    ],
+    [
+     "hour_cos",
+     0.8832
+    ],
+    [
+     "latitude",
+     0.3545
+    ]
+   ],
+   "injection": [
+    [
+     "hour_sin",
+     5.4633
+    ],
+    [
+     "hour_cos",
+     3.192
+    ],
+    [
+     "dev_Modbus",
+     1.3599
+    ]
+   ],
+   "password": [
+    [
+     "hour_sin",
+     1.8869
+    ],
+    [
+     "hour_cos",
+     1.0916
+    ],
+    [
+     "dev_Modbus",
+     0.4445
+    ]
+   ],
+   "ransomware": [
+    [
+     "hour_sin",
+     6.4185
+    ],
+    [
+     "hour_cos",
+     5.3898
+    ],
+    [
+     "dev_Garage_Door",
+     0.8452
+    ]
+   ],
+   "scanning": [
+    [
+     "hour_sin",
+     1.31
+    ],
+    [
+     "hour_cos",
+     1.2052
+    ],
+    [
+     "latitude",
+     0.3455
+    ]
+   ],
+   "xss": [
+    [
+     "hour_sin",
+     6.4726
+    ],
+    [
+     "hour_cos",
+     4.0657
+    ],
+    [
+     "dev_Garage_Door",
+     0.636
+    ]
+   ]
+  }
+ }
+]

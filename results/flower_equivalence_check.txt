@@ -1,0 +1,5 @@
+round 1: max |w_sim - w_flower| = 1.49e-08
+round 2: max |w_sim - w_flower| = 5.96e-08
+round 3: max |w_sim - w_flower| = 7.45e-09
+round 4: max |w_sim - w_flower| = 7.45e-09
+round 5: max |w_sim - w_flower| = 7.45e-09

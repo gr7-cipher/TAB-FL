@@ -1,0 +1,39 @@
+{
+ "host": "arm64 / Darwin 25.5.0, 1 CPU thread",
+ "torch": "2.11.0",
+ "ciciot2023": {
+  "n_features": 39,
+  "params": 16712,
+  "size_kb_fp32": 65.28125,
+  "size_kb_int8": 16.3203125,
+  "comm_mb_per_round": 2.67392,
+  "comm_mb_per_client_round": 0.133696,
+  "latency": {
+   "median_ms": 0.6434374954551458,
+   "p95_ms": 1.2675434467382727,
+   "batched256_us_per_sample": 15.428898245772869
+  }
+ },
+ "toniot": {
+  "n_features": 26,
+  "params": 16712,
+  "size_kb_fp32": 65.28125,
+  "size_kb_int8": 16.3203125,
+  "comm_mb_per_round": 2.67392,
+  "comm_mb_per_client_round": 0.133696,
+  "latency": {
+   "median_ms": 0.4696664400398731,
+   "p95_ms": 0.707562529714778,
+   "batched256_us_per_sample": 12.656184958359518
+  }
+ },
+ "aggregation_ms": {
+  "FedAvg": 0.14839606592431664,
+  "FedProx": 0.19162497483193874,
+  "Krum": 7.921270502265543,
+  "Multi-Krum": 8.136354037560523,
+  "Median": 5.504104541614652,
+  "Trimmed Mean": 4.599541483912617,
+  "TAB-FL": 123.27479204395786
+ }
+}
