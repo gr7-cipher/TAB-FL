@@ -21,7 +21,7 @@
 % ---------------- edge tier
 \node[gw] (g1) {Traffic controller\\[-1pt]{\tiny $\mathcal{D}_1$, 1D-CNN+BiGRU}};
 \node[gw,below=0.35cm of g1] (g2) {Substation gateway\\[-1pt]{\tiny $\mathcal{D}_2$, 1D-CNN+BiGRU}};
-\node[bad,below=0.35cm of g2] (g3) {Compromised hub\\[-1pt]{\tiny poisoned $\tilde{\mathcal{D}}_3$ or $\tilde{\Delta}_3$}};
+\node[bad,below=0.35cm of g2] (g3) {Compromised hub\\[-1pt]{\tiny poisoned data $\mathcal{D}_3$ or report $\Delta_3$}};
 \node[gw,below=0.35cm of g3] (g4) {Municipal IoT hub\\[-1pt]{\tiny $\mathcal{D}_K$, 1D-CNN+BiGRU}};
 \node[above=0.15cm of g1,font=\scriptsize\bfseries,align=center] (et) {Edge tier ($K$ gateways)\\[-1pt]{\tiny\mdseries non-IID city zones}};
 \begin{scope}[on background layer]
@@ -29,12 +29,12 @@
 \end{scope}
 
 % threat box
-\node[draw=cred,fill=cred!4,rounded corners=2pt,align=left,left=0.55cm of g3,text width=2.3cm,font=\tiny] (thr) {\textbf{Byzantine threats}\\label flipping\\sign flipping ($-\lambda\Delta$)\\Gaussian noise\\backdoor + scaling ($\gamma\Delta$)};
+\node[draw=cred,fill=cred!4,rounded corners=2pt,align=left,left=0.55cm of g3,text width=2.3cm,font=\tiny] (thr) {\textbf{Byzantine threats}\\label flipping\\sign flipping ($-\lambda\Delta w_i$)\\Gaussian noise\\backdoor + scaling ($\gamma\Delta w_i$)};
 \draw[marr] (thr.east) -- (g3.west);
 
 % ---------------- server tier
-\node[blk,right=1.9cm of g1,yshift=0.1cm] (rec) {Collect updates $\Delta w_i^{(t)}$\\[-1pt]{\tiny reference: coordinate median $\tilde{\Delta}^{(t)}$ over trusted set}};
-\node[hl,below=0.3cm of rec] (l1) {\textbf{Layer 1: consistency scoring}\\[-1pt]{\tiny layer-wise cosine $s_i$, norm ratio $\rho_i$, root-set loss $\ell_i$, gain $g_i$}};
+\node[blk,right=1.9cm of g1,yshift=0.1cm] (rec) {Collect reports $\Delta_i^{(t)}$\\[-1pt]{\tiny reference: coordinate median $\tilde{\Delta}^{(t)}$ over trusted set}};
+\node[hl,below=0.3cm of rec] (l1) {\textbf{Layer 1: consistency scoring}\\[-1pt]{\tiny layer-wise cosine $s_i$, norm ratio $r_i$, root-set loss $\ell_i$, gain $g_i$}};
 \node[hl,below=0.3cm of l1] (phi) {robust $z$-scores $\rightarrow$ $\phi_i^{(t)}\in[0,1]$};
 \node[hl,below=0.3cm of phi] (l2) {\textbf{Layer 2: reputation}\\[-1pt]{\tiny $T_i^{(t)}=\alpha T_i^{(t-1)}+(1-\alpha)\phi_i^{(t)}$}};
 \node[hl,below=0.3cm of l2] (q) {quarantine $T_i<\tau_t$; clip; weight $T_i/\sum_j T_j$};
